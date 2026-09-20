@@ -1,0 +1,6 @@
+interface:
+  display_name: "TP"
+  short_description: "Traceable problem-set AI interactions"
+  default_prompt: "Use $tp for this substantive problem-set request."
+policy:
+  allow_implicit_invocation: false
