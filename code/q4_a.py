@@ -20,6 +20,7 @@ DEFAULT_DATA_OUTPUT = Path("output/q4_bond_variables.csv")
 DEFAULT_TABLE_OUTPUT = Path("output/q4a_table.tex")
 EXPECTED_MATURITIES = [1, 2, 3, 4, 5]
 REQUIRED_COLUMNS = {"month", "H", "Y"}
+ANNUAL_LAG_MONTHS = 12
 
 
 def validate_prepared_data(data: pd.DataFrame) -> pd.DataFrame:
@@ -63,6 +64,18 @@ def validate_prepared_data(data: pd.DataFrame) -> pd.DataFrame:
             f"{incomplete.head().to_dict()}"
         )
 
+    observed_months = pd.PeriodIndex(sorted(validated["month"].unique()), freq="M")
+    expected_months = pd.period_range(
+        observed_months.min(), observed_months.max(), freq="M"
+    )
+    missing_months = expected_months.difference(observed_months)
+    if not missing_months.empty:
+        examples = [str(month) for month in missing_months[:5]]
+        raise ValueError(
+            "The monthly panel has calendar gaps, so a 12-row shift would not "
+            f"always represent 12 months. Missing examples: {examples}"
+        )
+
     return validated.sort_values(["month", "H"], kind="stable").reset_index(drop=True)
 
 
@@ -84,10 +97,10 @@ def construct_bond_variables(data: pd.DataFrame) -> pd.DataFrame:
         )
 
     returns = pd.DataFrame(index=log_yields.index, columns=EXPECTED_MATURITIES)
-    returns[1] = log_yields[1].shift(1)
+    returns[1] = log_yields[1].shift(ANNUAL_LAG_MONTHS)
     for maturity in EXPECTED_MATURITIES[1:]:
         returns[maturity] = (
-            maturity * log_yields[maturity].shift(1)
+            maturity * log_yields[maturity].shift(ANNUAL_LAG_MONTHS)
             - (maturity - 1) * log_yields[maturity - 1]
         )
 
