@@ -150,7 +150,7 @@ def create_figure(results: pd.DataFrame, output_path: Path) -> None:
     axis.plot(
         results["H"],
         results["b_re"],
-        color="#1f77b4",
+        color="#ff0000",
         marker="o",
         markersize=4,
         linewidth=1.8,
@@ -159,7 +159,7 @@ def create_figure(results: pd.DataFrame, output_path: Path) -> None:
     axis.plot(
         results["H"],
         results["b_dg"],
-        color="#d62728",
+        color="#0000ff",
         marker="s",
         markersize=4,
         linewidth=1.8,
@@ -168,7 +168,7 @@ def create_figure(results: pd.DataFrame, output_path: Path) -> None:
     axis.plot(
         results["H"],
         results["b_dp"],
-        color="#2ca02c",
+        color="#00ff00",
         marker="^",
         markersize=4,
         linewidth=1.8,
