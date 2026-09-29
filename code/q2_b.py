@@ -143,8 +143,8 @@ def hac_covariance(
 
 def newey_west_1994_covariance(
     design: np.ndarray, residuals: np.ndarray
-) -> tuple[np.ndarray, int, int]:
-    """Newey-West (1994) plug-in bandwidth with VAR(1) prewhitening."""
+) -> tuple[np.ndarray, int, int, float, float]:
+    """Newey-West (1994) plug-in bandwidth without prewhitening."""
     sample_size, n_parameters = design.shape
     if n_parameters != 2:
         raise ValueError("This implementation expects an intercept and one predictor.")
@@ -152,23 +152,17 @@ def newey_west_1994_covariance(
         raise ValueError("Sample is too short for automatic bandwidth selection.")
 
     scores = design * residuals[:, None]
-    current = scores[1:]
-    lagged = scores[:-1]
-    a_hat = (current.T @ lagged) @ np.linalg.inv(lagged.T @ lagged)
-    prewhitened = current - (a_hat @ lagged.T).T
-    prewhitened_size = len(prewhitened)
-
     preliminary_lag = int(np.floor(4.0 * (sample_size / 100.0) ** (2.0 / 9.0)))
-    preliminary_lag = min(preliminary_lag, prewhitened_size - 1)
-    scalar_scores = prewhitened @ np.array([0.0, 1.0])
+    preliminary_lag = min(preliminary_lag, sample_size - 1)
+    scalar_scores = scores @ np.array([0.0, 1.0])
 
     autocovariances: list[float] = []
     for lag in range(preliminary_lag + 1):
-        left = scalar_scores[preliminary_lag:]
-        right = scalar_scores[
-            preliminary_lag - lag : prewhitened_size - lag
-        ]
-        autocovariances.append(float(left @ right) / prewhitened_size)
+        if lag == 0:
+            cross_product = float(scalar_scores @ scalar_scores)
+        else:
+            cross_product = float(scalar_scores[lag:] @ scalar_scores[:-lag])
+        autocovariances.append(cross_product / sample_size)
 
     s_zero = autocovariances[0] + 2.0 * sum(autocovariances[1:])
     s_one = 2.0 * sum(
@@ -179,23 +173,18 @@ def newey_west_1994_covariance(
         raise ValueError("Newey-West plug-in denominator is zero or non-finite.")
 
     plug_in_constant = 1.1447 * ((s_one / s_zero) ** 2) ** (1.0 / 3.0)
-    bandwidth = int(np.floor(plug_in_constant * sample_size ** (1.0 / 3.0)))
-    bandwidth = max(0, min(bandwidth, prewhitened_size - 1))
+    raw_bandwidth = plug_in_constant * sample_size ** (1.0 / 3.0)
+    bandwidth = int(np.floor(raw_bandwidth))
+    bandwidth = max(0, min(bandwidth, sample_size - 1))
 
-    spectral_prewhitened = (prewhitened.T @ prewhitened) / prewhitened_size
-    for lag in range(1, bandwidth + 1):
-        autocovariance = (
-            prewhitened[lag:].T @ prewhitened[:-lag]
-        ) / prewhitened_size
-        bartlett_weight = 1.0 - lag / (bandwidth + 1.0)
-        spectral_prewhitened += bartlett_weight * (
-            autocovariance + autocovariance.T
-        )
-
-    recoloring = np.linalg.inv(np.eye(n_parameters) - a_hat)
-    spectral_density = recoloring @ spectral_prewhitened @ recoloring.T
-    covariance = sandwich_covariance(design, spectral_density)
-    return covariance, bandwidth, preliminary_lag
+    covariance = hac_covariance(design, residuals, bandwidth, True)
+    return (
+        covariance,
+        bandwidth,
+        preliminary_lag,
+        plug_in_constant,
+        raw_bandwidth,
+    )
 
 
 def inference_result(
@@ -212,7 +201,7 @@ def inference_result(
 
 def estimate_inference_methods(
     data: pd.DataFrame,
-) -> tuple[list[InferenceResult], int, int, int]:
+) -> tuple[list[InferenceResult], int, int, int, float, float]:
     """Estimate Question 2b and apply all five covariance estimators."""
     validated = validate_data(data)
     regression_data = pd.DataFrame(
@@ -226,9 +215,13 @@ def estimate_inference_methods(
         regression_data["predictor"].to_numpy(),
     )
 
-    automatic_covariance, automatic_bandwidth, preliminary_lag = (
-        newey_west_1994_covariance(design, residuals)
-    )
+    (
+        automatic_covariance,
+        automatic_bandwidth,
+        preliminary_lag,
+        plug_in_constant,
+        raw_bandwidth,
+    ) = newey_west_1994_covariance(design, residuals)
     covariance_methods = [
         ("OLS", ols_covariance(design, residuals)),
         ("White", white_covariance(design, residuals)),
@@ -246,13 +239,23 @@ def estimate_inference_methods(
         inference_result(method, coefficients, covariance)
         for method, covariance in covariance_methods
     ]
-    return results, len(regression_data), automatic_bandwidth, preliminary_lag
+    return (
+        results,
+        len(regression_data),
+        automatic_bandwidth,
+        preliminary_lag,
+        plug_in_constant,
+        raw_bandwidth,
+    )
 
 
 def format_latex_table(
     results: list[InferenceResult],
     nobs: int,
     automatic_bandwidth: int,
+    preliminary_lag: int,
+    plug_in_constant: float,
+    raw_bandwidth: float,
 ) -> str:
     """Format the Question 2b inference comparison as a LaTeX table."""
     rows = [
@@ -284,6 +287,15 @@ def format_latex_table(
                 r"Hansen-Hodrick (11) uses uniform weights. The data-driven "
                 r"Newey-West bandwidth is $L="
                 + str(automatic_bandwidth)
+                + r"$. It is obtained without prewhitening: the preliminary "
+                r"lag is $q="
+                + str(preliminary_lag)
+                + r"$, the estimated plug-in constant is $"
+                + f"{plug_in_constant:.4f}"
+                + r"$, and the unrounded bandwidth is $"
+                + f"{raw_bandwidth:.4f}"
+                + r"$, which is rounded down to $L="
+                + str(automatic_bandwidth)
                 + r"$."
             ),
             r"\end{minipage}",
@@ -302,17 +314,31 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    results, nobs, automatic_bandwidth, preliminary_lag = (
-        estimate_inference_methods(pd.read_csv(args.input))
-    )
+    (
+        results,
+        nobs,
+        automatic_bandwidth,
+        preliminary_lag,
+        plug_in_constant,
+        raw_bandwidth,
+    ) = estimate_inference_methods(pd.read_csv(args.input))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
-        format_latex_table(results, nobs, automatic_bandwidth),
+        format_latex_table(
+            results,
+            nobs,
+            automatic_bandwidth,
+            preliminary_lag,
+            plug_in_constant,
+            raw_bandwidth,
+        ),
         encoding="utf-8",
     )
 
     print(f"Regression observations = {nobs}")
     print(f"Automatic Newey-West preliminary lag = {preliminary_lag}")
+    print(f"Automatic Newey-West plug-in constant = {plug_in_constant:.12f}")
+    print(f"Automatic Newey-West raw bandwidth = {raw_bandwidth:.12f}")
     print(f"Automatic Newey-West bandwidth = {automatic_bandwidth}")
     for result in results:
         print(
