@@ -1,0 +1,2 @@
+overall_r2_os,oos_start_date,oos_end_date,n_forecasts,rolling_start_date,rolling_end_date,rolling_window_months,initial_G_t,final_G_t
+0.032066452650,1940-12,2021-12,973,1990-12,2021-12,600,0.994535426080,1.027795582097
