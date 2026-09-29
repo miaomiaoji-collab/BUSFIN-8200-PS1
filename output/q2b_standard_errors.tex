@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Predictive-regression inference for excess equity returns}
+\label{tab:q2b_standard_errors}
+\begin{tabular}{lrrr}
+\toprule
+Method & $b$ & Standard error & $t$-statistic \\
+\midrule
+OLS & 2.8038 & 0.3802 & 7.38 \\
+White & 2.8038 & 0.6587 & 4.26 \\
+Newey-West (11) & 2.8038 & 1.2990 & 2.16 \\
+Hansen-Hodrick (11) & 2.8038 & 1.4537 & 1.93 \\
+Newey-West (data-driven) & 2.8038 & 1.5721 & 1.78 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize\textit{Note:} All rows use the same OLS slope estimate and $N=1117$ observations. Newey-West (11) uses Bartlett weights; Hansen-Hodrick (11) uses uniform weights. The data-driven Newey-West bandwidth is $L=16$.
+\end{minipage}
+\end{table}
