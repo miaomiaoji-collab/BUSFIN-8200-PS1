@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import t as student_t
 
 from q3_c import (
     DEFAULT_BM_GP_INPUT,
@@ -268,14 +269,14 @@ def fama_macbeth_summary(monthly_estimates: pd.DataFrame) -> pd.DataFrame:
 def format_result_cell(
     summary: pd.DataFrame, method: str, specification: int, coefficient: str
 ) -> str:
-    """Format one estimate with its Fama-MacBeth t-statistic in parentheses."""
+    """Format one stacked estimate/t-statistic cell with significance stars."""
     row = summary.loc[
         summary["method"].eq(method)
         & summary["specification"].eq(specification)
         & summary["coefficient"].eq(coefficient)
     ]
     if row.empty:
-        return r"--"
+        return ""
     if len(row) != 1:
         raise ValueError("Fama-MacBeth summary has duplicate result cells.")
     result = row.iloc[0]
@@ -285,23 +286,60 @@ def format_result_cell(
         estimate = 0.0
     if abs(t_statistic) < 0.005:
         t_statistic = 0.0
-    return f"{estimate:.4f} ({t_statistic:.2f})"
+    months = int(result["months"])
+    p_value = float(2.0 * student_t.sf(abs(float(result["t_statistic"])), months - 1))
+    if p_value < 0.01:
+        stars = "***"
+    elif p_value < 0.05:
+        stars = "**"
+    elif p_value < 0.10:
+        stars = "*"
+    else:
+        stars = ""
+    star_superscript = f"^{{{stars}}}" if stars else ""
+    return (
+        rf"\shortstack{{${estimate:.4f}{star_superscript}$"
+        rf"\\$({t_statistic:.2f})$}}"
+    )
+
+
+def format_months_cell(
+    summary: pd.DataFrame, method: str, specification: int
+) -> str:
+    """Return the number of monthly estimates used in one specification."""
+    months = summary.loc[
+        summary["method"].eq(method)
+        & summary["specification"].eq(specification),
+        "months",
+    ].unique()
+    if len(months) != 1:
+        raise ValueError("A specification does not have one common month count.")
+    return str(int(months[0]))
 
 
 def format_latex_table(summary: pd.DataFrame, monthly: pd.DataFrame) -> str:
-    """Format the 14 requested OLS/WLS specifications as a LaTeX table."""
-    rows: list[str] = []
+    """Format seven specification columns in separate OLS and WLS panels."""
+    coefficient_labels = {
+        "Intercept": "Intercept",
+        "QBM": r"$Q^{BM}$",
+        "QGP": r"$Q^{GP}$",
+        "QDur": r"$Q^{Dur}$",
+    }
+    panel_rows: dict[str, list[str]] = {}
     for method in ["OLS", "WLS"]:
-        for specification in SPECIFICATIONS:
+        rows: list[str] = []
+        for coefficient in COEFFICIENT_COLUMNS:
             cells = [
                 format_result_cell(summary, method, specification.number, coefficient)
-                for coefficient in COEFFICIENT_COLUMNS
+                for specification in SPECIFICATIONS
             ]
-            rows.append(
-                f"{method} & ({specification.number}) & "
-                + " & ".join(cells)
-                + r" \\"
-            )
+            rows.append(coefficient_labels[coefficient] + " & " + " & ".join(cells) + r" \\")
+        month_cells = [
+            format_months_cell(summary, method, specification.number)
+            for specification in SPECIFICATIONS
+        ]
+        rows.append("Months & " + " & ".join(month_cells) + r" \\")
+        panel_rows[method] = rows
 
     coverage = (
         monthly.groupby(["method", "specification"], sort=False)["month"]
@@ -316,25 +354,35 @@ def format_latex_table(summary: pd.DataFrame, monthly: pd.DataFrame) -> str:
         [
             r"\begin{table}[htbp]",
             r"\centering",
-            r"\caption{Firm-level Fama--MacBeth regressions}",
-            r"\label{tab:q3d_fama_macbeth}",
-            r"\begin{tabular}{llrrrr}",
-            r"\toprule",
             (
-                r"Method & Specification & Intercept & $Q^{BM}$ & "
-                r"$Q^{GP}$ & $Q^{Dur}$ \\"
+                r"\caption{Fama--MacBeth regressions of next-month stock "
+                r"excess returns: conventional inference}"
             ),
+            r"\label{tab:q3d_fama_macbeth}",
+            r"\setlength{\tabcolsep}{4pt}",
+            r"\renewcommand{\arraystretch}{1.05}",
+            r"\begin{tabular}{lccccccc}",
+            r"\toprule",
+            r" & (1) & (2) & (3) & (4) & (5) & (6) & (7) \\",
             r"\midrule",
-            *rows[:7],
+            r"\multicolumn{8}{l}{\textit{Panel A: OLS}} \\",
+            r"\addlinespace[2pt]",
+            *panel_rows["OLS"],
             r"\midrule",
-            *rows[7:],
+            r"\multicolumn{8}{l}{\textit{Panel B: WLS}} \\",
+            r"\addlinespace[2pt]",
+            *panel_rows["WLS"],
             r"\bottomrule",
             r"\end{tabular}",
             r"\begin{minipage}{0.98\textwidth}",
             (
                 r"\footnotesize\textit{Note:} Each cell reports the time-series "
-                r"average of the monthly cross-sectional coefficient, with its "
-                r"ordinary Fama--MacBeth $t$-statistic in parentheses. Signal "
+                r"average of the monthly cross-sectional coefficient on the first "
+                r"line, with its ordinary Fama--MacBeth $t$-statistic in parentheses "
+                r"below. Stars are based on two-sided Student-$t$ p-values using "
+                r"$T-1$ degrees of freedom, where $T$ is the number of monthly "
+                r"coefficient estimates: $^{*}p<0.10$, $^{**}p<0.05$, and "
+                r"$^{***}p<0.01$. Signal "
                 r"quantiles are monthly percentile ranks calculated using average "
                 r"ranks for ties. Signals dated $\tau$ explain excess returns dated "
                 r"$\tau+1$. WLS uses market equity dated $\tau$. Each specification "
