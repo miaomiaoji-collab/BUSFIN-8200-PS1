@@ -527,7 +527,8 @@ def format_latex_table(results: pd.DataFrame) -> str:
         }[row.signal]
         rows.append(
             f"{signal_label} & {row.portfolio_type} & "
-            f"{row.average_hml:.4f} & {row.t_statistic:.2f} \\\\"
+            f"{row.average_hml * 100:.2f}" + r"\% & "
+            f"{row.t_statistic:.2f} \\\\"
         )
     bandwidths = results["bandwidth"].astype(int)
     return "\n".join(
@@ -538,7 +539,7 @@ def format_latex_table(results: pd.DataFrame) -> str:
             r"\label{tab:q3c_hml_results}",
             r"\begin{tabular}{llrr}",
             r"\toprule",
-            r"Signal & Portfolio construction & Average HML & $t$-statistic \\",
+            r"Signal & Portfolio construction & Average HML (\%) & $t$-statistic \\",
             r"\midrule",
             *rows,
             r"\bottomrule",
@@ -552,7 +553,7 @@ def format_latex_table(results: pd.DataFrame) -> str:
                 r"the Newey--West (1987, 1994) automatic-bandwidth procedure "
                 r"without prewhitening or recoloring. Selected bandwidths range "
                 f"from $L={bandwidths.min()}$ to $L={bandwidths.max()}$. "
-                r"Returns are reported in decimal monthly units."
+                r"Average HML returns are reported as monthly percentages."
             ),
             r"\end{minipage}",
             r"\end{table}",
