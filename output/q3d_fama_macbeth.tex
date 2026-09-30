@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\centering
+\caption{Firm-level Fama--MacBeth regressions}
+\label{tab:q3d_fama_macbeth}
+\begin{tabular}{llrrrr}
+\toprule
+Method & Specification & Intercept & $Q^{BM}$ & $Q^{GP}$ & $Q^{Dur}$ \\
+\midrule
+OLS & (1) & 0.0046 (1.79) & 0.0093 (5.86) & -- & -- \\
+OLS & (2) & 0.0052 (1.90) & -- & 0.0069 (4.82) & -- \\
+OLS & (3) & 0.0161 (7.04) & -- & -- & -0.0114 (-6.51) \\
+OLS & (4) & 0.0000 (0.00) & 0.0103 (6.35) & 0.0079 (5.37) & -- \\
+OLS & (5) & 0.0133 (5.67) & 0.0036 (1.67) & -- & -0.0095 (-4.94) \\
+OLS & (6) & 0.0143 (5.48) & -- & 0.0026 (1.80) & -0.0106 (-5.68) \\
+OLS & (7) & 0.0070 (2.51) & 0.0065 (2.65) & 0.0054 (3.30) & -0.0060 (-2.68) \\
+\midrule
+WLS & (1) & 0.0057 (3.03) & 0.0021 (0.97) & -- & -- \\
+WLS & (2) & 0.0033 (1.64) & -- & 0.0049 (2.93) & -- \\
+WLS & (3) & 0.0134 (6.60) & -- & -- & -0.0092 (-3.82) \\
+WLS & (4) & 0.0000 (0.00) & 0.0065 (3.03) & 0.0075 (4.70) & -- \\
+WLS & (5) & 0.0134 (4.41) & -0.0021 (-0.64) & -- & -0.0083 (-2.70) \\
+WLS & (6) & 0.0080 (2.39) & -- & 0.0056 (2.12) & -0.0056 (-1.79) \\
+WLS & (7) & 0.0046 (1.16) & 0.0030 (1.09) & 0.0064 (2.40) & -0.0027 (-0.77) \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.98\textwidth}
+\footnotesize\textit{Note:} Each cell reports the time-series average of the monthly cross-sectional coefficient, with its ordinary Fama--MacBeth $t$-statistic in parentheses. Signal quantiles are monthly percentile ranks calculated using average ranks for ties. Signals dated $\tau$ explain excess returns dated $\tau+1$. WLS uses market equity dated $\tau$. Each specification uses its own complete-case sample. Coefficients are in decimal monthly-return units. Monthly regression coverage ranges from June 1963 through December 2024; specifications contain between 619 and 739 monthly estimates.
+\end{minipage}
+\end{table}
