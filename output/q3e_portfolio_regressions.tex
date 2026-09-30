@@ -1,0 +1,33 @@
+\begin{table}[htbp]
+\centering
+\caption{Portfolio-level multivariate return regressions}
+\label{tab:q3e_portfolio_regressions}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{lccccccc}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) & (7) \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel A: Value-weighted portfolios}} \\
+\addlinespace[2pt]
+Intercept & \shortstack{$0.0058^{***}$\\$(2.84)$} & \shortstack{$0.0049^{**}$\\$(2.12)$} & \shortstack{$0.0118^{***}$\\$(5.77)$} & \shortstack{$0.0024$\\$(0.96)$} & \shortstack{$0.0098^{***}$\\$(3.18)$} & \shortstack{$0.0131^{***}$\\$(4.08)$} & \shortstack{$0.0127^{**}$\\$(1.98)$} \\
+$Dec^{BM}$ & \shortstack{$0.0003$\\$(1.43)$} &  &  & \shortstack{$0.0004^{*}$\\$(1.94)$} & \shortstack{$0.0002$\\$(0.68)$} &  & \shortstack{$0.0000$\\$(0.05)$} \\
+$Dec^{GP}$ &  & \shortstack{$0.0003$\\$(1.63)$} &  & \shortstack{$0.0004^{**}$\\$(2.23)$} &  & \shortstack{$-0.0002$\\$(-0.86)$} & \shortstack{$-0.0002$\\$(-0.48)$} \\
+$Dec^{Dur}$ &  &  & \shortstack{$-0.0006^{***}$\\$(-3.32)$} &  & \shortstack{$-0.0005^{*}$\\$(-1.89)$} & \shortstack{$-0.0008^{***}$\\$(-3.22)$} & \shortstack{$-0.0008^{*}$\\$(-1.73)$} \\
+Observations & 6190 & 6190 & 6190 & 12380 & 12380 & 12380 & 18570 \\
+DK bandwidth & 3 & 2 & 2 & 1 & 2 & 1 & 1 \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel B: Equal-weighted portfolios}} \\
+\addlinespace[2pt]
+Intercept & \shortstack{$0.0052^{*}$\\$(1.76)$} & \shortstack{$0.0060^{*}$\\$(1.90)$} & \shortstack{$0.0155^{***}$\\$(6.31)$} & \shortstack{$-0.0027$\\$(-0.72)$} & \shortstack{$0.0125^{***}$\\$(3.60)$} & \shortstack{$0.0163^{***}$\\$(4.79)$} & \shortstack{$0.0091$\\$(1.29)$} \\
+$Dec^{BM}$ & \shortstack{$0.0009^{***}$\\$(4.57)$} &  &  & \shortstack{$0.0012^{***}$\\$(4.96)$} & \shortstack{$0.0004$\\$(1.24)$} &  & \shortstack{$0.0006$\\$(1.16)$} \\
+$Dec^{GP}$ &  & \shortstack{$0.0007^{***}$\\$(4.58)$} &  & \shortstack{$0.0011^{***}$\\$(5.42)$} &  & \shortstack{$0.0000$\\$(-0.01)$} & \shortstack{$0.0004$\\$(1.10)$} \\
+$Dec^{Dur}$ &  &  & \shortstack{$-0.0009^{***}$\\$(-6.09)$} &  & \shortstack{$-0.0009^{***}$\\$(-2.81)$} & \shortstack{$-0.0011^{***}$\\$(-5.20)$} & \shortstack{$-0.0008^{*}$\\$(-1.75)$} \\
+Observations & 6190 & 6190 & 6190 & 12380 & 12380 & 12380 & 18570 \\
+DK bandwidth & 3 & 5 & 4 & 5 & 4 & 4 & 5 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.98\textwidth}
+\footnotesize\textit{Note:} Pooled OLS estimates. Parentheses contain Driscoll--Kraay $t$-statistics based on monthly pooled score sums, Bartlett weights, and the no-prewhitening Newey--West (1994) automatic bandwidth rule used in Question 2(b). $^{*}$, $^{**}$, and $^{***}$ denote $|t|\geq 1.645$, $|t|\geq 1.96$, and $|t|\geq 2.576$, respectively. Portfolios are formed each June using NYSE breakpoints. Signals dated $\tau$ explain returns dated $\tau+1$. The common signal-month sample is June 1973 through December 2024; returns run from July 1973 through January 2025.
+\end{minipage}
+\end{table}
