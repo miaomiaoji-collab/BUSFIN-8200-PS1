@@ -364,7 +364,7 @@ def result_cell(result: dict[str, object], coefficient: str) -> str:
     t_statistics = result["t_statistics"]
     if coefficient not in coefficients:
         return ""
-    estimate = float(coefficients[coefficient])
+    estimate = 100.0 * float(coefficients[coefficient])
     t_statistic = float(t_statistics[coefficient])
     if abs(estimate) < 0.00005:
         estimate = 0.0
@@ -428,8 +428,10 @@ def format_table(results: dict[str, list[dict[str, object]]]) -> str:
                 r"score sums, Bartlett weights, and the no-prewhitening Newey--West "
                 r"(1994) automatic bandwidth rule used in Question 2(b). "
                 r"$^{*}$, $^{**}$, and $^{***}$ denote $|t|\geq 1.645$, "
-                r"$|t|\geq 1.96$, and $|t|\geq 2.576$, respectively. Portfolios "
-                r"are formed each June using NYSE breakpoints. Signals dated "
+                r"$|t|\geq 1.96$, and $|t|\geq 2.576$, respectively. "
+                r"Coefficient estimates are reported in monthly percentage points; "
+                r"the underlying pooled regressions remain in decimal return units. "
+                r"Portfolios are formed each June using NYSE breakpoints. Signals dated "
                 r"$\tau$ explain returns dated $\tau+1$. The common signal-month "
                 r"sample is June 1973 through December 2024; returns run from July "
                 r"1973 through January 2025."
