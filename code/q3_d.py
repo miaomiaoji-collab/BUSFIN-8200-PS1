@@ -21,7 +21,6 @@ from q3_c import (
     DEFAULT_CRSP_INPUT,
     DEFAULT_FF3_INPUT,
     FORMATION_END,
-    FORMATION_START,
     prepare_return_data,
     read_crsp,
     read_risk_free_rate,
@@ -30,6 +29,8 @@ from q3_c import (
 
 DEFAULT_DURATION_INPUT = Path("data/Q3/Dur.csv")
 DEFAULT_TABLE_OUTPUT = Path("output/q3d_fama_macbeth.tex")
+COMMON_SAMPLE_START = pd.Timestamp("1973-06-01")
+COMMON_SAMPLE_END = FORMATION_END
 
 
 @dataclass(frozen=True)
@@ -111,7 +112,7 @@ def prepare_analysis_panel(
 ) -> pd.DataFrame:
     """Construct month-tau signals, quantiles, weights, and tau+1 returns."""
     formation = crsp.loc[
-        crsp["month"].between(FORMATION_START, FORMATION_END),
+        crsp["month"].between(COMMON_SAMPLE_START, COMMON_SAMPLE_END),
         ["PERMNO", "month", "yyyymm", "ME"],
     ].copy()
     formation = formation.merge(
@@ -226,6 +227,26 @@ def estimate_monthly_regressions(panel: pd.DataFrame) -> pd.DataFrame:
     estimates = pd.DataFrame(rows)
     if estimates.empty:
         raise ValueError("No monthly regressions were estimable.")
+    expected_months = pd.date_range(
+        COMMON_SAMPLE_START, COMMON_SAMPLE_END, freq="MS"
+    )
+    for method in ["OLS", "WLS"]:
+        for specification in SPECIFICATIONS:
+            actual_months = pd.DatetimeIndex(
+                estimates.loc[
+                    estimates["method"].eq(method)
+                    & estimates["specification"].eq(specification.number),
+                    "month",
+                ].sort_values()
+            )
+            if not actual_months.equals(expected_months):
+                missing = expected_months.difference(actual_months)
+                extra = actual_months.difference(expected_months)
+                raise ValueError(
+                    f"{method} specification {specification.number} does not use "
+                    f"the required common time sample; missing={list(missing)}, "
+                    f"extra={list(extra)}."
+                )
     return estimates
 
 
@@ -280,7 +301,7 @@ def format_result_cell(
     if len(row) != 1:
         raise ValueError("Fama-MacBeth summary has duplicate result cells.")
     result = row.iloc[0]
-    estimate = float(result["estimate"])
+    estimate = 100.0 * float(result["estimate"])
     t_statistic = float(result["t_statistic"])
     if abs(estimate) < 0.00005:
         estimate = 0.0
@@ -349,7 +370,6 @@ def format_latex_table(summary: pd.DataFrame, monthly: pd.DataFrame) -> str:
     earliest = coverage["min"].min()
     latest = coverage["max"].max()
     minimum_months = int(coverage["nunique"].min())
-    maximum_months = int(coverage["nunique"].max())
     return "\n".join(
         [
             r"\begin{table}[htbp]",
@@ -386,10 +406,13 @@ def format_latex_table(summary: pd.DataFrame, monthly: pd.DataFrame) -> str:
                 r"quantiles are monthly percentile ranks calculated using average "
                 r"ranks for ties. Signals dated $\tau$ explain excess returns dated "
                 r"$\tau+1$. WLS uses market equity dated $\tau$. Each specification "
-                r"uses its own complete-case sample. Coefficients are in decimal "
-                r"monthly-return units. Monthly regression coverage ranges from "
-                f"{earliest:%B %Y} through {latest:%B %Y}; specifications contain "
-                f"between {minimum_months} and {maximum_months} monthly estimates."
+                r"uses its own within-month complete-case firm sample. All "
+                r"specifications use the common signal-month sample from "
+                f"{earliest:%B %Y} through {latest:%B %Y}, with returns from July "
+                r"1973 through January 2025. Coefficient estimates are reported in "
+                r"monthly percentage points; the underlying signal quantiles remain "
+                r"on their 0-to-1 percentile-rank scale. Each specification contains "
+                f"{minimum_months} monthly estimates."
             ),
             r"\end{minipage}",
             r"\end{table}",
@@ -444,7 +467,7 @@ def main() -> None:
     print(f"Non-finite GP values treated as missing: {nonfinite_counts['GP']:,}")
     print(
         "Formation window: "
-        f"{FORMATION_START:%Y-%m} through {FORMATION_END:%Y-%m}."
+        f"{COMMON_SAMPLE_START:%Y-%m} through {COMMON_SAMPLE_END:%Y-%m}."
     )
     print("Monthly regression coverage:")
     print(coverage.to_string(index=False))
