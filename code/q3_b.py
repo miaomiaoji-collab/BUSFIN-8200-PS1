@@ -3,8 +3,7 @@
 The script implements the empirical design in ``spec/q3.md``. It constructs
 book equity from Compustat, combines it with prior-December CRSP market equity,
 holds book-to-market fixed from June through the following May, and compares
-the result with the Chen-Zimmermann BMdec signal under both the assignment's
-exponential definition and the requested level diagnostic.
+the result with the Chen-Zimmermann BMdec book-to-market ratio.
 """
 
 from __future__ import annotations
@@ -24,19 +23,13 @@ import pandas as pd
 
 DEFAULT_CCM_INPUT = Path("data/Q3/CRSP_Compustat.csv")
 DEFAULT_CZ_INPUT = Path("data/Q3/bmdec_gp_firm_monthly_202510.csv")
-DEFAULT_MAIN_INTERCEPT_OUTPUT = Path("output/q3b_intercepts.pdf")
-DEFAULT_MAIN_SLOPE_OUTPUT = Path("output/q3b_slopes.pdf")
-DEFAULT_MAIN_R2_OUTPUT = Path("output/q3b_r2.pdf")
-DEFAULT_LEVEL_INTERCEPT_OUTPUT = Path("output/q3b_level_intercepts.pdf")
-DEFAULT_LEVEL_SLOPE_OUTPUT = Path("output/q3b_level_slopes.pdf")
-DEFAULT_LEVEL_R2_OUTPUT = Path("output/q3b_level_r2.pdf")
+DEFAULT_INTERCEPT_OUTPUT = Path("output/q3b_intercepts.pdf")
+DEFAULT_SLOPE_OUTPUT = Path("output/q3b_slopes.pdf")
+DEFAULT_R2_OUTPUT = Path("output/q3b_r2.pdf")
 
 ANALYSIS_START = pd.Timestamp("1963-06-01")
 FIRST_PORTFOLIO_YEAR = 1963
 DEFAULT_CHUNK_SIZE = 400_000
-FLOAT_EXP_LIMIT = float(np.log(np.finfo("float64").max))
-EXPECTED_OVERFLOW_OBSERVATIONS = 6
-
 CCM_COLUMNS = [
     "PERMNO",
     "SICCD",
@@ -345,10 +338,8 @@ def read_cz_book_to_market(path: Path) -> pd.DataFrame:
     return data
 
 
-def merge_with_cz(
-    monthly_bm: pd.DataFrame, cz: pd.DataFrame
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Return main exponential and diagnostic level comparison samples."""
+def merge_with_cz(monthly_bm: pd.DataFrame, cz: pd.DataFrame) -> pd.DataFrame:
+    """Return the matched sample with Chen-Zimmermann BMdec in levels."""
     merged = monthly_bm.merge(
         cz,
         left_on=["PERMNO", "yyyymm"],
@@ -359,22 +350,10 @@ def merge_with_cz(
     if merged.empty:
         raise ValueError("The constructed BM-CZ merge contains no usable rows.")
 
-    level = merged.copy()
-    level["BMCZ"] = level["BMdec"]
-
-    overflow = merged["BMdec"].gt(FLOAT_EXP_LIMIT)
-    if int(overflow.sum()) != EXPECTED_OVERFLOW_OBSERVATIONS:
-        raise ValueError(
-            "Expected exactly six matched exp(BMdec) overflows under the "
-            f"approved specification, found {int(overflow.sum())}."
-        )
-    main = merged.loc[~overflow].copy()
-    main["BMCZ"] = np.exp(main["BMdec"])
-    if not np.isfinite(main[["BM", "BMCZ"]].to_numpy()).all():
-        raise ValueError("Main BM comparison still contains non-finite values.")
-    if not np.isfinite(level[["BM", "BMCZ"]].to_numpy()).all():
-        raise ValueError("Level BM diagnostic contains non-finite values.")
-    return main, level
+    merged["BMCZ"] = merged["BMdec"]
+    if not np.isfinite(merged[["BM", "BMCZ"]].to_numpy()).all():
+        raise ValueError("BM comparison contains non-finite values.")
+    return merged
 
 
 def estimate_monthly_regressions(data: pd.DataFrame) -> pd.DataFrame:
@@ -430,52 +409,17 @@ def create_time_series_figure(
     plt.close(figure)
 
 
-def comparison_summary(
-    main_results: pd.DataFrame, level_results: pd.DataFrame
-) -> pd.DataFrame:
-    """Summarize the main-versus-level monthly regression comparison."""
-    compared = main_results.merge(
-        level_results,
-        on="month",
-        suffixes=("_exp", "_level"),
-        validate="one_to_one",
-    )
-    rows = []
-    for statistic in ["intercept", "slope", "r_squared"]:
-        difference = compared[f"{statistic}_exp"] - compared[f"{statistic}_level"]
-        rows.append(
-            {
-                "statistic": statistic,
-                "mean_exp": compared[f"{statistic}_exp"].mean(),
-                "mean_level": compared[f"{statistic}_level"].mean(),
-                "median_exp": compared[f"{statistic}_exp"].median(),
-                "median_level": compared[f"{statistic}_level"].median(),
-                "median_absolute_difference": difference.abs().median(),
-            }
-        )
-    return pd.DataFrame(rows)
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Implement Question 3b.")
     parser.add_argument("--ccm-input", type=Path, default=DEFAULT_CCM_INPUT)
     parser.add_argument("--cz-input", type=Path, default=DEFAULT_CZ_INPUT)
     parser.add_argument(
-        "--main-intercept-output", type=Path, default=DEFAULT_MAIN_INTERCEPT_OUTPUT
+        "--intercept-output", type=Path, default=DEFAULT_INTERCEPT_OUTPUT
     )
     parser.add_argument(
-        "--main-slope-output", type=Path, default=DEFAULT_MAIN_SLOPE_OUTPUT
+        "--slope-output", type=Path, default=DEFAULT_SLOPE_OUTPUT
     )
-    parser.add_argument("--main-r2-output", type=Path, default=DEFAULT_MAIN_R2_OUTPUT)
-    parser.add_argument(
-        "--level-intercept-output", type=Path, default=DEFAULT_LEVEL_INTERCEPT_OUTPUT
-    )
-    parser.add_argument(
-        "--level-slope-output", type=Path, default=DEFAULT_LEVEL_SLOPE_OUTPUT
-    )
-    parser.add_argument(
-        "--level-r2-output", type=Path, default=DEFAULT_LEVEL_R2_OUTPUT
-    )
+    parser.add_argument("--r2-output", type=Path, default=DEFAULT_R2_OUTPUT)
     parser.add_argument("--chunk-size", type=int, default=DEFAULT_CHUNK_SIZE)
     return parser.parse_args()
 
@@ -490,52 +434,32 @@ def main() -> None:
     book_equity = construct_book_equity(accounting)
     monthly_bm = construct_monthly_book_to_market(monthly_crsp, book_equity)
     cz = read_cz_book_to_market(args.cz_input)
-    main_sample, level_sample = merge_with_cz(monthly_bm, cz)
-    main_results = estimate_monthly_regressions(main_sample)
-    level_results = estimate_monthly_regressions(level_sample)
+    sample = merge_with_cz(monthly_bm, cz)
+    results = estimate_monthly_regressions(sample)
 
     create_time_series_figure(
-        main_results,
+        results,
         "intercept",
         r"Intercept, $a_\tau$",
-        args.main_intercept_output,
+        args.intercept_output,
     )
     create_time_series_figure(
-        main_results, "slope", r"Slope, $b_\tau$", args.main_slope_output
+        results, "slope", r"Slope, $b_\tau$", args.slope_output
     )
     create_time_series_figure(
-        main_results, "r_squared", r"$R^2$", args.main_r2_output
-    )
-    create_time_series_figure(
-        level_results,
-        "intercept",
-        r"Intercept, $a_\tau$",
-        args.level_intercept_output,
-    )
-    create_time_series_figure(
-        level_results, "slope", r"Slope, $b_\tau$", args.level_slope_output
-    )
-    create_time_series_figure(
-        level_results, "r_squared", r"$R^2$", args.level_r2_output
+        results, "r_squared", r"$R^2$", args.r2_output
     )
 
-    summary = comparison_summary(main_results, level_results)
     print(f"Removed {duplicate_rows_removed:,} duplicate CRSP firm-month rows.")
     print(
-        f"Level diagnostic sample: {len(level_sample):,} firm-months from "
-        f"{level_sample['month'].min():%Y-%m} through "
-        f"{level_sample['month'].max():%Y-%m}."
+        f"Matched sample: {len(sample):,} firm-months from "
+        f"{sample['month'].min():%Y-%m} through "
+        f"{sample['month'].max():%Y-%m}."
     )
-    print(
-        f"Main exponential sample: {len(main_sample):,} firm-months after "
-        f"excluding {len(level_sample) - len(main_sample):,} approved overflows."
-    )
-    print(
-        f"Estimated {len(main_results):,} main and {len(level_results):,} "
-        "diagnostic monthly regressions."
-    )
-    print(summary.to_string(index=False, float_format=lambda value: f"{value:.6g}"))
-    print("Saved the three main and three diagnostic figures.")
+    print(f"Estimated {len(results):,} monthly regressions.")
+    summary = results[["intercept", "slope", "r_squared"]].agg(["mean", "median"])
+    print(summary.to_string(float_format=lambda value: f"{value:.6g}"))
+    print("Saved the three requested figures.")
 
 
 if __name__ == "__main__":
