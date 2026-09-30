@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\centering
+\caption{High-minus-low excess returns for Chen--Zimmermann signals}
+\label{tab:q3c_hml_results}
+\begin{tabular}{llrr}
+\toprule
+Signal & Portfolio construction & Average HML & $t$-statistic \\
+\midrule
+$BM^{CZ}$ & Value-weighted, annual, NYSE breakpoints & 0.0031 & 1.47 \\
+$BM^{CZ}$ & Equal-weighted, annual, NYSE breakpoints & 0.0096 & 4.93 \\
+$BM^{CZ}$ & Value-weighted, monthly, NYSE breakpoints & 0.0033 & 1.62 \\
+$BM^{CZ}$ & Value-weighted, annual, general breakpoints & 0.0033 & 1.36 \\
+$BM^{CZ}$ & Equal-weighted, monthly, general breakpoints & 0.0093 & 4.76 \\
+$MOM^{CZ}$ & Value-weighted, annual, NYSE breakpoints & 0.0053 & 2.36 \\
+$MOM^{CZ}$ & Equal-weighted, annual, NYSE breakpoints & -0.0019 & -0.89 \\
+$MOM^{CZ}$ & Value-weighted, monthly, NYSE breakpoints & 0.0123 & 4.53 \\
+$MOM^{CZ}$ & Value-weighted, annual, general breakpoints & 0.0075 & 2.59 \\
+$MOM^{CZ}$ & Equal-weighted, monthly, general breakpoints & 0.0062 & 1.96 \\
+$GP^{CZ}$ & Value-weighted, annual, NYSE breakpoints & 0.0032 & 1.99 \\
+$GP^{CZ}$ & Equal-weighted, annual, NYSE breakpoints & 0.0052 & 3.20 \\
+$GP^{CZ}$ & Value-weighted, monthly, NYSE breakpoints & 0.0032 & 1.88 \\
+$GP^{CZ}$ & Value-weighted, annual, general breakpoints & 0.0042 & 2.05 \\
+$GP^{CZ}$ & Equal-weighted, monthly, general breakpoints & 0.0059 & 2.88 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.96\textwidth}
+\footnotesize\textit{Note:} HML is the monthly excess return of decile 10 minus decile 1. Signals observed in month $\tau$ earn returns in month $\tau+1$. Value-weighted returns use market equity from the previous month. The $t$-statistics use the Newey--West (1987, 1994) automatic-bandwidth procedure without prewhitening or recoloring. Selected bandwidths range from $L=1$ to $L=12$. Returns are reported in decimal monthly units.
+\end{minipage}
+\end{table}
