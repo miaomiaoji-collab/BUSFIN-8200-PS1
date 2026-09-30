@@ -1,0 +1,1311 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{booktabs} 
+\usepackage{amsmath}
+\usepackage{float}
+
+\title{Asset Pricing HW 1}
+\author{Yueer Chen}
+\date{September 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Q1}
+
+\subsection{Q1(a)}
+
+
+Starting from the definition of the gross equity return,
+\[
+R_{e,t+1}
+=
+\frac{P_{t+1}+D_{t+1}}{P_t},
+\]
+taking logs gives
+\begin{align*}
+r_{e,t+1}
+&=
+\log(P_{t+1}+D_{t+1})-\log(P_t) \\
+&=
+\log\left[
+P_{t+1}
+\left(
+1+\frac{D_{t+1}}{P_{t+1}}
+\right)
+\right]
+-\log(P_t) \\
+&=
+p_{t+1}
++\log\left(1+e^{d_{t+1}-p_{t+1}}\right)
+-p_t,
+\end{align*}
+where
+\[
+r_{e,t+1}\equiv\log(R_{e,t+1}),
+\qquad
+p_t\equiv\log(P_t),
+\qquad
+d_t\equiv\log(D_t).
+\]
+
+Define
+\[
+f(x)\equiv\log(1+e^x),
+\qquad
+x=d_{t+1}-p_{t+1}=dp_{t+1}.
+\]
+We take a first-order Taylor expansion around the fixed average value
+\[
+\bar{x}\equiv\overline{dp}.
+\]
+Thus,
+\[
+f(x)
+\approx
+f(\bar{x})+f'(\bar{x})(x-\bar{x}).
+\]
+Because
+\[
+f'(x)=\frac{e^x}{1+e^x},
+\]
+define
+\[
+\kappa\equiv\frac{1}{1+e^{\bar{x}}},
+\]
+so that
+\[
+f'(\bar{x})
+=
+\frac{e^{\bar{x}}}{1+e^{\bar{x}}}
+=
+1-\kappa.
+\]
+Therefore,
+\begin{align*}
+f(x)
+&\approx
+f(\bar{x})+(1-\kappa)(x-\bar{x}) \\
+&=
+\underbrace{
+f(\bar{x})-(1-\kappa)\bar{x}
+}_{\kappa_0}
++(1-\kappa)x,
+\end{align*}
+where
+\begin{align*}
+\kappa_0
+&\equiv
+\log(1+e^{\bar{x}})
+-(1-\kappa)\bar{x} \\
+&=
+-\log(\kappa)
+-(1-\kappa)\log\left(\frac{1}{\kappa}-1\right).
+\end{align*}
+
+Substituting the approximation into the log-return equation gives
+\begin{align*}
+r_{e,t+1}
+&\approx
+p_{t+1}
++\kappa_0
++(1-\kappa)(d_{t+1}-p_{t+1})
+-p_t \\
+&=
+\kappa_0
++(1-\kappa)d_{t+1}
++\kappa p_{t+1}
+-p_t.
+\end{align*}
+
+Using
+\[
+dp_t=d_t-p_t
+\qquad\text{and}\qquad
+\Delta d_{t+1}=d_{t+1}-d_t,
+\]
+we obtain the one-period relation
+\[
+dp_t
+\approx
+-\kappa_0
++r_{e,t+1}
+-\Delta d_{t+1}
++\kappa dp_{t+1}.
+\]
+
+Applying the same relation one period ahead,
+\[
+dp_{t+1}
+\approx
+-\kappa_0
++r_{e,t+2}
+-\Delta d_{t+2}
++\kappa dp_{t+2},
+\]
+and substituting this expression into the previous equation gives
+\begin{align*}
+dp_t
+\approx\;&
+-\kappa_0
++r_{e,t+1}
+-\Delta d_{t+1} \\
+&+
+\kappa
+\left(
+-\kappa_0
++r_{e,t+2}
+-\Delta d_{t+2}
++\kappa dp_{t+2}
+\right) \\
+=\;&
+-\kappa_0(1+\kappa)
++r_{e,t+1}
++\kappa r_{e,t+2} \\
+&-
+\Delta d_{t+1}
+-\kappa\Delta d_{t+2}
++\kappa^2dp_{t+2}.
+\end{align*}
+
+Continuing this recursive substitution until \(t+H\) gives
+\begin{align*}
+dp_t
+\approx\;&
+-\kappa_0
+\left(
+1+\kappa+\kappa^2+\cdots+\kappa^{H-1}
+\right) \\
+&+
+\sum_{h=1}^{H}\kappa^{h-1}r_{e,t+h}
+-
+\sum_{h=1}^{H}\kappa^{h-1}\Delta d_{t+h}
++
+\kappa^Hdp_{t+H}.
+\end{align*}
+
+For the constant term, define
+\[
+S
+=
+1+\kappa+\kappa^2+\cdots+\kappa^{H-1}.
+\]
+Multiplying both sides by \(\kappa\) gives
+\[
+\kappa S
+=
+\kappa+\kappa^2+\cdots+\kappa^H.
+\]
+Subtracting the second equation from the first,
+\[
+S-\kappa S
+=
+1-\kappa^H.
+\]
+Therefore,
+\[
+(1-\kappa)S
+=
+1-\kappa^H,
+\]
+so that
+\[
+S
+=
+\frac{1-\kappa^H}{1-\kappa}.
+\]
+
+Hence,
+\[
+-\kappa_0
+\left(
+1+\kappa+\cdots+\kappa^{H-1}
+\right)
+=
+-\kappa_0
+\frac{1-\kappa^H}{1-\kappa}
+=
+\frac{\kappa_0(\kappa^H-1)}{1-\kappa}.
+\]
+
+Thus,
+\begin{equation}
+dp_t
+\approx
+\frac{\kappa_0(\kappa^H-1)}{1-\kappa}
++
+\sum_{h=1}^{H}\kappa^{h-1}r_{e,t+h}
+-
+\sum_{h=1}^{H}\kappa^{h-1}\Delta d_{t+h}
++
+\kappa^Hdp_{t+H}.
+\tag{1.1}
+\end{equation}
+
+Taking conditional expectations at time \(t\), and using
+\[
+\mathbb{E}_t[dp_t]=dp_t,
+\]
+gives
+\begin{equation}
+dp_t
+\approx
+\frac{\kappa_0(\kappa^H-1)}{1-\kappa}
++
+\sum_{h=1}^{H}\kappa^{h-1}
+\mathbb{E}_t[r_{e,t+h}]
+-
+\sum_{h=1}^{H}\kappa^{h-1}
+\mathbb{E}_t[\Delta d_{t+h}]
++
+\kappa^H\mathbb{E}_t[dp_{t+H}].
+\tag{1.2}
+\end{equation}
+
+Since
+\[
+\kappa=\frac{1}{1+e^{\bar{x}}},
+\]
+we have
+\[
+0<\kappa<1,
+\]
+and therefore
+\[
+\kappa^H\to 0
+\qquad\text{as}\qquad
+H\to\infty.
+\]
+
+To obtain the infinite-horizon relation, impose the no-bubble
+(or transversality) condition
+\[
+\lim_{H\to\infty}
+\kappa^H\mathbb{E}_t[dp_{t+H}]
+=
+0.
+\]
+
+Taking \(H\to\infty\) in Equation (1.2),
+\[
+\frac{\kappa_0(\kappa^H-1)}{1-\kappa}
+\to
+-\frac{\kappa_0}{1-\kappa}.
+\]
+Therefore,
+\begin{equation}
+dp_t
+\approx
+-\frac{\kappa_0}{1-\kappa}
++
+\sum_{h=1}^{\infty}
+\kappa^{h-1}
+\mathbb{E}_t[r_{e,t+h}]
+-
+\sum_{h=1}^{\infty}
+\kappa^{h-1}
+\mathbb{E}_t[\Delta d_{t+h}].
+\tag{1.3}
+\end{equation}
+
+The derivation requires \(P_t>0\) and \(D_t>0\) so that log prices
+and log dividends are well defined. It also relies on a first-order
+Taylor approximation around the fixed average log dividend-price ratio.
+Finally, the infinite-horizon expression requires the no-bubble
+(or transversality) condition
+\[
+\lim_{H\to\infty}
+\kappa^H\mathbb{E}_t[dp_{t+H}]
+=
+0.
+\]
+
+\newpage
+
+\subsection{Q1(b)}
+
+
+
+Figure \ref{fig:vardp} shows that at short horizons, most of the variation in the dividend-price ratio is accounted for by the terminal dividend-price ratio component, while the future return and dividend-growth components are relatively small. As \(H\) increases, \(b_{dp}^{(H)}\) decreases and approaches zero, showing that the terminal dividend-price ratio becomes less important at longer horizons. At the same time, \(b_{re}^{(H)}\) increases steadily and becomes the largest component. The dividend-growth component remains positive but is much smaller than the return component at long horizons. Overall, the results suggest that variation in the aggregate dividend-price ratio is mainly associated with variation in expected future returns rather than expected dividend growth.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{q1b_decomposition.pdf}
+    \caption{Decomposition of Variation in the Dividend-Price Ratio}
+    \label{fig:vardp}
+\end{figure}
+
+\newpage
+
+\subsection{Q1(c)}
+
+
+
+
+Figure \ref{fig:var_vardp} shows that at short horizons, most of the variation in \(dp_t\) is explained by the terminal dividend-price ratio component. As \(H\) increases, \(b_{dp,\mathrm{VAR}}^{(H)}\) declines steadily toward zero, while both the expected-return and expected-dividend-growth components increase. At longer horizons, the two components become similar in magnitude, with the dividend-growth component slightly larger than the return component. This suggests that, under the VAR, long-run variation in the dividend-price ratio is explained by both expected future returns and expected dividend growth, rather than mainly by expected returns alone. Compared with Question 1(b), the VAR-implied decomposition assigns a larger role to expected dividend growth at long horizons.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{q1c_decomposition.pdf}
+    \caption{VAR-Implied Decomposition of Variation in the Dividend-Price Ratio}
+    \label{fig:var_vardp}
+\end{figure}
+
+
+
+\subsection{Q1(d)}
+
+
+The VAR implies
+
+\[
+b_{re}^{(\infty)} = 0.4899,
+\qquad
+b_{\Delta d}^{(\infty)} = 0.5089.
+\]
+
+
+The results suggest that at the infinite horizon, expected future returns and expected dividend growth contribute almost equally to variation in the dividend-price ratio.
+
+\newpage
+
+\subsection{Q1(e)}
+
+By definition,
+\[
+dy_t=\log\left(1+\frac{D_t}{P_t}\right).
+\]
+Starting from
+\[
+R_{e,t+1}=\frac{P_{t+1}+D_{t+1}}{P_t},
+\]
+taking logs gives
+\[
+r_{e,t+1}
+=
+p_{t+1}
++
+\log\left(1+\frac{D_{t+1}}{P_{t+1}}\right)
+-p_t
+=
+p_{t+1}+dy_{t+1}-p_t.
+\]
+Subtracting
+\[
+\Delta d_{t+1}=d_{t+1}-d_t
+\]
+from both sides yields
+\begin{align*}
+r_{e,t+1}-\Delta d_{t+1}
+&=
+p_{t+1}-d_{t+1}+dy_{t+1}+d_t-p_t.
+\end{align*}
+
+Let
+\[
+dp_t=d_t-p_t=\log\left(\frac{D_t}{P_t}\right).
+\]
+Because
+\[
+dy_t=\log(1+e^{dp_t}),
+\]
+we have
+\[
+e^{dy_t}=1+e^{dp_t},
+\]
+and therefore
+\begin{align*}
+dp_t
+&=\log(e^{dy_t}-1)\\
+&=\log\left[e^{dy_t}(1-e^{-dy_t})\right]\\
+&=dy_t+\log(1-e^{-dy_t}).
+\end{align*}
+Substituting this expression into the preceding identity gives
+\begin{align*}
+r_{e,t+1}-\Delta d_{t+1}
+&=
+dy_t+\log(1-e^{-dy_t})
+-\log(1-e^{-dy_{t+1}}).
+\end{align*}
+
+Now define
+\[
+f(y)=\log(1-e^{-y}).
+\]
+A first-order Taylor expansion around the average value
+\(\overline{dy}\) gives
+\[
+f(y)
+\approx
+f(\overline{dy})
++
+f'(\overline{dy})(y-\overline{dy}).
+\]
+Since
+\[
+f'(y)=\frac{e^{-y}}{1-e^{-y}},
+\]
+define
+\[
+\kappa=e^{-\overline{dy}}.
+\]
+It follows that
+\[
+f(\overline{dy})=\log(1-\kappa)
+\qquad\text{and}\qquad
+f'(\overline{dy})=\frac{\kappa}{1-\kappa}.
+\]
+Thus,
+\[
+\log(1-e^{-dy_t})
+\approx
+\log(1-\kappa)
++
+\frac{\kappa}{1-\kappa}
+(dy_t-\overline{dy}).
+\]
+
+Substituting this approximation, we obtain
+\begin{align*}
+r_{e,t+1}-\Delta d_{t+1}
+&\approx
+dy_t
++
+\log(1-\kappa)
++
+\frac{\kappa}{1-\kappa}(dy_t-\overline{dy})\\
+&\quad
+-
+\log(1-\kappa)
+-
+\frac{\kappa}{1-\kappa}(dy_{t+1}-\overline{dy})\\
+&=
+\frac{1}{1-\kappa}dy_t
+-
+\frac{\kappa}{1-\kappa}dy_{t+1}.
+\end{align*}
+Rearranging gives the one-period approximate identity
+\[
+dy_t
+\approx
+(1-\kappa)
+\left(r_{e,t+1}-\Delta d_{t+1}\right)
++
+\kappa dy_{t+1}.
+\]
+
+Recursively substituting for future values of \(dy\) through
+time \(t+H\) gives
+\begin{align}
+dy_t
+&\approx
+(1-\kappa)
+\sum_{h=1}^{H}
+\kappa^{h-1}
+\left(r_{e,t+h}-\Delta d_{t+h}\right)
++
+\kappa^Hdy_{t+H}
+\nonumber\\
+&=
+(1-\kappa)
+\left(
+\sum_{h=1}^{H}\kappa^{h-1}r_{e,t+h}
+-
+\sum_{h=1}^{H}\kappa^{h-1}\Delta d_{t+h}
+\right)
++
+\kappa^Hdy_{t+H}.
+\tag{1.7}
+\end{align}
+
+Because \(dy_t\) is known at time \(t\), taking conditional
+expectations gives
+\begin{align}
+dy_t
+&=
+(1-\kappa)
+\left(
+\sum_{h=1}^{H}
+\kappa^{h-1}\mathrm{E}_t[r_{e,t+h}]
+-
+\sum_{h=1}^{H}
+\kappa^{h-1}\mathrm{E}_t[\Delta d_{t+h}]
+\right)
++
+\kappa^H\mathrm{E}_t[dy_{t+H}].
+\tag{1.8}
+\end{align}
+
+Finally, impose the no-bubble terminal condition
+\[
+\lim_{H\to\infty}
+\kappa^H\mathrm{E}_t[dy_{t+H}]
+=0.
+\]
+Taking \(H\to\infty\) in Equation (1.8) therefore yields
+\begin{align}
+dy_t
+&=
+(1-\kappa)
+\left(
+\sum_{h=1}^{\infty}
+\kappa^{h-1}\mathrm{E}_t[r_{e,t+h}]
+-
+\sum_{h=1}^{\infty}
+\kappa^{h-1}\mathrm{E}_t[\Delta d_{t+h}]
+\right).
+\tag{1.9}
+\end{align}
+
+The derivation requires \(P_t>0\) and \(D_t>0\) so that log prices
+and log dividends are well defined. The derivation uses a first-order Taylor approximation around the average value $\overline{dy}$ and the no-bubble condition for the infinite-horizon expression.
+
+
+
+
+\section{Q2}
+
+\subsection{Q2(a)}
+
+For each horizon \(H=1,\ldots,15\), estimate
+\[
+\frac{1}{H}\sum_{h=1}^{H} xR_{e,t+h}
+=
+a^{(H)}+b^{(H)}\frac{D_t}{P_t}+\varepsilon_t^{(H)},
+\]
+
+
+Figure~\ref{fig:q2a} plots the adjusted \(R^2\) across horizons.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{q2a_adj_r2.pdf}
+    \caption{Adjusted \(R^2\) of return-predictive regressions across horizons}
+    \label{fig:q2a}
+\end{figure}
+
+\input{q2a_results.tex}
+
+The adjusted \(R^2\) generally increases with the return horizon. This suggests that the dividend-price ratio has stronger predictive power for long-horizon excess returns than for short-horizon excess returns.
+
+\newpage
+
+\subsection{Q2(b)}
+
+Estimate
+\[
+xR_{e,t+1}
+=
+a+b\frac{D_t}{P_t}+\varepsilon_t.
+\]
+
+The same coefficient estimate is obtained under all five methods, but the estimated standard errors and \(t\)-statistics differ.
+
+\input{q2b_standard_errors.tex}
+
+The OLS standard error is the smallest, giving the largest \(t\)-statistic. The White standard error is larger because it allows for heteroskedasticity, but it still does not account for autocorrelation. The Newey--West and Hansen--Hodrick standard errors are larger because they account for the autocorrelation created by overlapping annual returns in the monthly data. As a result, the corresponding \(t\)-statistics are much lower.
+
+Using the Newey--West (1994) automatic bandwidth procedure, the preliminary lag is \(q=\left\lfloor 4(1117/100)^{2/9}\right\rfloor=6\). The estimated quantities are \(S_0=0.0009458904\) and \(S_1=0.0023971961\), which imply the plug-in constant \(\widehat{\mathrm{const}}=1.1447\left[\left(S_1/S_0\right)^2\right]^{1/3}=2.1278\). Therefore, the data-driven bandwidth is \(L=\left\lfloor \widehat{\mathrm{const}}\times1117^{1/3}\right\rfloor=22\). Using this bandwidth, the estimated standard error is \(1.2523\), with a corresponding \(t\)-statistic of \(2.24\).
+
+Overall, the results show that inference is sensitive to the treatment of serial correlation. Ignoring autocorrelation makes the predictive relation appear much more statistically significant.
+
+
+
+
+\newpage
+
+\subsection{Q2(c)}
+
+Following Amihud and Hurvich (2004), first, estimate
+\[
+\frac{D_{t+1}}{P_{t+1}}
+=
+\theta+\phi\frac{D_t}{P_t}+u_{t+1},
+\]
+which gives
+\[
+\hat\theta=0.0111,
+\qquad
+\hat\phi=0.7197.
+\]
+
+Therefore, the predictor $\frac{D_t}{P_t}$ is persistent.
+
+Using \(T=94\), the bias-corrected persistence coefficient is
+\[
+\hat\phi^c
+=
+\hat\phi
++\frac{1}{T}(1+3\hat\phi)
++\frac{3}{T^2}(1+3\hat\phi)
+=
+0.7544.
+\]
+
+Then construct
+\[
+\hat u^c_{t+1}
+=
+\frac{D_{t+1}}{P_{t+1}}
+-
+\left(
+\hat\theta+\hat\phi^c\frac{D_t}{P_t}
+\right),
+\]
+and estimate
+\[
+xR_{e,t+1}
+=
+a+b\frac{D_t}{P_t}
++b_u\hat u^c_{t+1}
++\varepsilon_t.
+\]
+
+The estimates are
+\[
+\hat b_{2c}=2.3362,
+\qquad
+\hat b_u=-13.4837.
+\]
+
+For comparison,
+\[
+\hat b_{2b}=2.8038,
+\qquad
+\hat b_{2c}-\hat b_{2b}=-0.4676.
+\]
+
+The bias correction reduces the estimated predictive coefficient, consistent with the finite-sample bias induced by a persistent predictor.
+
+
+\newpage
+
+\subsection{Q2(d)}
+
+The predictive regression is evaluated using an expanding-window out-of-sample procedure. For each forecast date \(t+1\), only information available through time \(t\) is used to estimate
+\[
+xR_{e,s+1}
+=
+a_t+b_t\frac{D_s}{P_s}+\varepsilon_s.
+\]
+The corresponding out-of-sample forecast is
+\[
+\hat E_t^{OS}[xR_e]
+=
+\hat a_t+\hat b_t\frac{D_t}{P_t}.
+\]
+
+The benchmark forecast, \(\bar{xR}_{e,t}\), is the expanding-window average of realized excess returns over the same historical sample. The in-sample fitted value is
+\[
+\hat E_t^{IS}[xR_e]
+=
+\hat a^{IS}+\hat b^{IS}\frac{D_t}{P_t},
+\]
+where \(\hat a^{IS}\) and \(\hat b^{IS}\) are estimated using the full sample.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{q2d_forecasts.pdf}
+    \caption{Historical mean, in-sample fitted values, and out-of-sample forecasts}
+    \label{fig:q2d_forecasts}
+\end{figure}
+
+Figure~\ref{fig:q2d_forecasts} shows that the out-of-sample forecast varies substantially over time and is generally more volatile than the historical mean. The in-sample fitted value and the out-of-sample forecast often move in the same direction, although they differ considerably in some periods.
+
+The overall out-of-sample \(R^2\) is
+\[
+R^2_{OS}
+=
+1-
+\frac{
+\sum_t
+\left(xR_{e,t+1}-\hat E_t^{OS}[xR_e]\right)^2
+}{
+\sum_t
+\left(xR_{e,t+1}-\bar{xR}_{e,t}\right)^2
+}
+=
+-0.0061.
+\]
+
+The out-of-sample period runs from December 1940 to December 2021 and contains 973 forecasts. Since \(R^2_{OS}\) is slightly negative, the dividend-price ratio model does not outperform the expanding-window historical-mean benchmark over the full out-of-sample period.
+
+To examine changes in forecasting performance over time, \(R^2_{OS}\) is also calculated using a 50-year rolling window of forecast errors, while the estimation of \(a_t\) and \(b_t\) remains expanding-window.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{q2d_rolling_r2os.pdf}
+    \caption{50-year rolling out-of-sample \(R^2_{OS}\)}
+    \label{fig:q2d_rolling}
+\end{figure}
+
+Figure~\ref{fig:q2d_rolling} shows that the rolling \(R^2_{OS}\) is strongly positive in the early part of the sample but declines over time. It becomes negative around 2000, returns close to zero or slightly positive in some later periods, and becomes clearly negative again near the end of the sample. The out-of-sample predictive performance of the dividend-price ratio is therefore not stable over time.
+
+\newpage
+
+\subsection{Q2(e)}
+
+The out-of-sample exercise in Q2(d) is repeated under the steady-state restrictions
+\[
+\hat a_t = G_t-1,
+\qquad
+\hat b_t = G_t,
+\]
+where \(G_t\) is the expanding-window historical average of \(e^{\Delta d_t}\) computed over the same historical sample used for the benchmark forecast.
+
+The restricted out-of-sample forecast is
+\[
+\hat E_t^{OS}[xR_e]
+=
+(G_t-1)
++
+G_t\frac{D_t}{P_t}.
+\]
+
+The same expanding-window historical mean, \(\bar{xR}_{e,t}\), and the same in-sample fitted value,
+\[
+\hat E_t^{IS}[xR_e]
+=
+\hat a^{IS}
++
+\hat b^{IS}\frac{D_t}{P_t},
+\]
+are used for comparison.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{q2e_forecasts.pdf}
+    \caption{Historical mean, in-sample fitted values, and restricted out-of-sample forecasts}
+    \label{fig:q2e_forecasts}
+\end{figure}
+
+The overall out-of-sample \(R^2\) is
+\[
+R^2_{OS}
+=
+1-
+\frac{
+\sum_t
+\left(
+xR_{e,t+1}-\hat E_t^{OS}[xR_e]
+\right)^2
+}{
+\sum_t
+\left(
+xR_{e,t+1}-\bar{xR}_{e,t}
+\right)^2
+}
+=
+0.0321.
+\]
+
+The out-of-sample period contains 973 forecasts from December 1940 to December 2021. Since \(R^2_{OS}\) is positive, the restricted model outperforms the expanding-window historical-mean benchmark over the full out-of-sample period.
+
+A 50-year rolling \(R^2_{OS}\) is also calculated using the same expanding-window estimation procedure.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{q2e_rolling_r2os.pdf}
+    \caption{50-year rolling out-of-sample \(R^2_{OS}\) under the steady-state restrictions}
+    \label{fig:q2e_rolling}
+\end{figure}
+
+The rolling \(R^2_{OS}\) remains positive throughout the sample. It is about \(0.082\) at the beginning of the rolling period and declines to about \(0.019\) by the end of the sample. Compared with Q2(d), the steady-state restrictions improve out-of-sample forecasting performance.
+
+
+
+
+\newpage
+
+\section{Q3}
+
+
+
+
+\subsection{Q3(a)}
+
+
+
+The CRSP monthly stock data are downloaded from CRSP and cover the period from January 1962 to December 2025. Earlier observations are used only to construct the momentum signal. The comparison with the Chen and Zimmermann momentum measure and the monthly cross-sectional regressions begin in June 1963.
+
+For each stock and month \(\tau\), construct the momentum signal as the cumulative return from month \(\tau-12\) to month \(\tau-1\),
+\[
+MOM_{i,\tau}
+=
+\prod_{h=1}^{12}(1+R_{i,\tau-h})-1.
+\]
+
+Then merge the constructed signal with the Chen and Zimmermann momentum measure, \(MOM^{CZ}_{i,\tau}\), and estimate the following cross-sectional regression separately in each month:
+\[
+MOM^{CZ}_{i,\tau}
+=
+a_\tau+b_\tau MOM_{i,\tau}+\varepsilon_{i,\tau}.
+\]
+
+
+Figure~\ref{fig:q3a_intercepts} plots the monthly intercept estimates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3a_intercepts.pdf}
+    \caption{Monthly cross-sectional regression intercepts}
+    \label{fig:q3a_intercepts}
+\end{figure}
+
+Figure~\ref{fig:q3a_slopes} plots the monthly slope estimates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3a_slopes.pdf}
+    \caption{Monthly cross-sectional regression slopes}
+    \label{fig:q3a_slopes}
+\end{figure}
+
+Figure~\ref{fig:q3a_r2} plots the monthly \(R^2\) values.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3a_r2.pdf}
+    \caption{Monthly cross-sectional regression \(R^2\)}
+    \label{fig:q3a_r2}
+\end{figure}
+
+The intercepts are generally close to zero, while the slopes are mostly around \(0.8\) to \(1.0\). The \(R^2\) values are also high in most months, generally around \(0.85\) to \(0.95\). Overall, the constructed momentum signal is strongly related to the Chen and Zimmermann measure.
+
+
+\newpage
+
+\subsection{Q3(b)}
+
+Book-to-market is constructed using book equity from Compustat and market equity from CRSP. Book equity is calculated as
+\[
+BE=SE+TXDITC-BVPS,
+\]
+and market equity is calculated as
+\[
+ME=|PRC|\times SHROUT.
+\]
+For June of year \(t\), BM uses accounting information from year \(t-1\) and market equity from December of year \(t-1\). The resulting BM is kept fixed from June of year \(t\) through May of year \(t+1\).
+
+For each month \(\tau\), estimate the cross-firm regression
+\[
+BM^{CZ}_{j,\tau}
+=
+a_\tau+b_\tau BM_{j,\tau}+\varepsilon_{j,\tau},
+\]
+using
+\[
+BM^{CZ}=BMdec.
+\]
+The downloaded Chen and Zimmermann (2022) data show that \(BMdec\) is already a book-to-market ratio rather than its logarithm, so it is used directly rather than exponentiated.
+
+Figure~\ref{fig:q3b_intercepts} plots the monthly intercept estimates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3b_intercepts.pdf}
+    \caption{Monthly cross-sectional regression intercepts}
+    \label{fig:q3b_intercepts}
+\end{figure}
+
+Figure~\ref{fig:q3b_slopes} plots the monthly slope estimates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3b_slopes.pdf}
+    \caption{Monthly cross-sectional regression slopes}
+    \label{fig:q3b_slopes}
+\end{figure}
+
+Figure~\ref{fig:q3b_r2} plots the monthly \(R^2\) values.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{q3b_r2.pdf}
+    \caption{Monthly cross-sectional regression \(R^2\)}
+    \label{fig:q3b_r2}
+\end{figure}
+
+The slopes are generally close to one and the \(R^2\) values are generally high, indicating that the constructed BM measure closely matches the Chen and Zimmermann measure. The intercepts are also generally small, although there are some periods with larger differences. 
+
+The sharp drop in \(R^2\) at the end of the sample is caused by one extreme firm rather than a general deterioration in the match between the two BM measures. From June to November 2024, PERMNO 18558 has
+\[
+BM=1.009378,
+\qquad
+BM^{CZ}=1096.598315.
+\]
+This single observation has an unusually large value of \(BM^{CZ}\) while its constructed BM is ordinary, and therefore strongly affects the monthly cross-sectional regressions. The reported \(R^2\) is only about \(0.0048\)--\(0.0050\) from June to November 2024. After excluding this one observation, the corresponding \(R^2\) values increase to about \(0.9927\)--\(0.9958\). In December 2024, the reported \(R^2\) returns to \(0.9841\). Therefore, the end-of-sample decline is driven by this single extreme observation rather than a broad decline in the accuracy of the constructed BM measure.
+
+
+
+
+
+\newpage
+
+\subsection{Q3(c)}
+
+Using the Chen and Zimmermann signals \(BM^{CZ}\), \(MOM^{CZ}\), and \(GP^{CZ}\), construct decile portfolios under five different portfolio-formation methods. For each method, calculate the average monthly excess return of each decile portfolio. HML is defined as the return of decile 10 minus decile 1.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{q3c_vw_annual_nyse.pdf}
+    \caption{Value-weighted portfolios, annual rebalancing, NYSE breakpoints}
+    \label{fig:q3c_vw_annual_nyse}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{q3c_ew_annual_nyse.pdf}
+    \caption{Equal-weighted portfolios, annual rebalancing, NYSE breakpoints}
+    \label{fig:q3c_ew_annual_nyse}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{q3c_vw_monthly_nyse.pdf}
+    \caption{Value-weighted portfolios, monthly rebalancing, NYSE breakpoints}
+    \label{fig:q3c_vw_monthly_nyse}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{q3c_vw_annual_general.pdf}
+    \caption{Value-weighted portfolios, annual rebalancing, general breakpoints}
+    \label{fig:q3c_vw_annual_general}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{q3c_ew_monthly_general.pdf}
+    \caption{Equal-weighted portfolios, monthly rebalancing, general breakpoints}
+    \label{fig:q3c_ew_monthly_general}
+\end{figure}
+
+\input{q3c_hml_results.tex}
+
+The portfolio returns generally increase across deciles for \(BM^{CZ}\) and \(GP^{CZ}\), indicating that stocks with higher book-to-market ratios and higher profitability tend to earn higher average excess returns. The pattern for \(MOM^{CZ}\) depends more on the portfolio construction method. 
+
+The HML results also vary across weighting and rebalancing methods. For \(BM^{CZ}\), the HML return is much stronger for equal-weighted portfolios than for value-weighted portfolios. For \(MOM^{CZ}\), the strongest HML result is obtained with monthly rebalancing and NYSE breakpoints, while the equal-weighted annual specification gives a negative HML return. The \(GP^{CZ}\) HML returns are positive across all five specifications.
+
+\newpage
+
+\subsection{Q3(d)}
+
+For each month \(\tau\), cross-sectional regressions of next-month stock excess returns are estimated using the quantiles of \(BM^{CZ}\), \(GP^{CZ}\), and \(Dur\). For each signal, the quantile is constructed as its monthly cross-sectional percentile rank using average ranks for ties, so that
+\[
+Q^X_{j,\tau}\in(0,1].
+\]
+
+Signals dated \(\tau\) are used to explain excess returns dated \(\tau+1\). Each of the seven specifications is estimated using both OLS and WLS, where WLS uses month-\(\tau\) market equity as the weight.
+
+To make the specifications directly comparable, all regressions use the common sample from June 1973 through December 2024, corresponding to next-month returns from July 1973 through January 2025. This gives 619 monthly cross-sectional regressions for each specification. Within each month, each specification uses its own complete-case firm sample.
+
+The Fama--MacBeth coefficient estimates are obtained by averaging the monthly cross-sectional coefficients over time. Coefficient estimates in the table are multiplied by 100 and are therefore reported in monthly percentage points. 
+
+\input{q3d_fama_macbeth.tex}
+
+The OLS results show that \(Q^{BM}\) and \(Q^{GP}\) are positively related to future excess returns, while \(Q^{Dur}\) is negatively related to future excess returns. When all three signals are included together, the OLS coefficients remain positive for \(Q^{BM}\) and \(Q^{GP}\) and negative for \(Q^{Dur}\), all statistically significant at the 1\% level. 
+
+The WLS results are generally weaker. In the full specification, \(Q^{GP}\) remains positive and statistically significant, while the coefficients on \(Q^{BM}\) and \(Q^{Dur}\) are smaller and not statistically significant. Overall, higher book-to-market and profitability are associated with higher future excess returns, while higher equity duration is associated with lower future excess returns. These relations are stronger in the OLS regressions than in the market-equity-weighted regressions.
+
+
+\newpage
+
+
+\subsection{Q3(e)}
+
+Decile portfolios are formed separately using \(BM^{CZ}\), \(GP^{CZ}\), and \(Dur\). The portfolios are rebalanced annually in June using NYSE breakpoints. Both value-weighted and equal-weighted portfolios are considered.
+
+For each portfolio \(p\) and month \(\tau\), the average signal decile of the firms in the portfolio is calculated. These portfolio-level measures are denoted by \(Dec^{BM}_{p,\tau}\), \(Dec^{GP}_{p,\tau}\), and \(Dec^{Dur}_{p,\tau}\). Signals dated \(\tau\) are used to explain portfolio excess returns dated \(\tau+1\).
+
+The seven specifications are estimated using pooled OLS. Driscoll--Kraay standard errors are calculated using Bartlett weights and an automatic bandwidth rule without prewhitening. The common signal-month sample runs from June 1973 through December 2024, with returns from July 1973 through January 2025.
+
+\input{q3e_portfolio_regressions.tex}
+
+For the value-weighted portfolios, the univariate coefficients on \(Dec^{BM}\) and \(Dec^{GP}\) are positive but relatively weak, while the coefficient on \(Dec^{Dur}\) is negative and statistically significant. In the full specification, the duration coefficient remains negative, while the BM and GP coefficients are close to zero.
+
+For the equal-weighted portfolios, \(Dec^{BM}\) and \(Dec^{GP}\) have positive and statistically significant coefficients in the univariate regressions, while \(Dec^{Dur}\) has a negative and statistically significant coefficient. When all three signals are included together, the coefficients become weaker. Overall, the portfolio regressions provide stronger evidence for a negative relation between equity duration and future returns, while the BM and GP relations are more sensitive to the portfolio weighting scheme and the inclusion of other signals.
+
+\newpage
+
+% \section{Q4}
+
+% \subsection{Q4(a)}
+
+% Using the Fama-Bliss bond yield data, log yields, forward rates, and annual bond returns are constructed for maturities from one to five years. Yield spreads $xy^{(H)}$, forward spreads $xf^{(H)}$, and excess bond returns $xr^{(H)}$ are then calculated relative to the one-year bond. Table \ref{tab:q4a-averages} reports the sample averages for $H=2,3,4,5$.
+
+% \begin{table}[H]
+% \centering
+% \caption{Average yield, forward-rate, and bond-return spreads}
+% \label{tab:q4a-averages}
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+% \midrule
+% Mean $xy(H)$ & 0.001686 & 0.003278 & 0.004660 & 0.005639 \\
+% Mean $xf(H)$ & 0.003372 & 0.006461 & 0.008805 & 0.009557 \\
+% Mean $xr(H)$ & 0.003154 & 0.006069 & 0.008198 & 0.008719 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% The average yield and forward spreads are positive and generally increase with maturity. Average excess bond returns are also positive for all maturities and are larger for longer-maturity bonds.
+
+% \subsection{Q4(b)}
+
+% Question 4(b) examines whether the current yield spread predicts future hold-to-maturity excess bond returns. For each maturity $H$, the average annual excess return from $t$ to $t+H$ is regressed on the current yield spread $xy_t^{(H)}$.
+
+% \begin{table}[H]
+% \centering
+% \caption{Regressions of hold-to-maturity excess returns on yield spreads}
+% \label{tab:q4b}
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+% \midrule
+% $b^{(H)}$ [t-statistic] & 0.677 [3.57] & 0.532 [3.21] & 0.414 [2.52] & 0.345 [2.30] \\
+% $R^2$ & 0.077 & 0.052 & 0.038 & 0.032 \\
+% Observations & 859 & 847 & 835 & 823 \\
+% \bottomrule
+% \end{tabular}
+% \begin{minipage}{0.92\textwidth}
+% \footnotesize\textit{Note:} OLS estimates. Brackets contain Hansen-Hodrick (1980) t-statistics using uniform weights and $L=12H-1$ monthly lags.
+% \end{minipage}
+% \end{table}
+
+% The estimated slope coefficients are positive for all maturities, indicating that larger yield spreads are associated with higher future hold-to-maturity excess bond returns. The estimated slope declines as maturity increases.
+
+
+% \subsection{Q4(c)}
+
+% Question 4(c) studies one-year-ahead return predictability using forward spreads. For each maturity, the next one-year excess bond return is regressed on the current forward spread $xf_t^{(H)}$. 
+
+% \begin{table}[H]
+% \centering
+% \caption{Regressions of one-year excess returns on forward spreads}
+% \label{tab:q4c}
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+% \midrule
+% $b^{(H)}$ [t-statistic] & 0.677 [2.52] & 0.889 [2.90] & 1.116 [3.23] & 0.964 [2.67] \\
+% $R^2$ & 0.077 & 0.086 & 0.107 & 0.067 \\
+% Observations & 859 & 859 & 859 & 859 \\
+% \bottomrule
+% \end{tabular}
+% \begin{minipage}{0.92\textwidth}
+% \footnotesize\textit{Note:} OLS estimates. Brackets contain Bartlett Newey-West (1987) t-statistics using the automatic bandwidth and VAR(1) prewhitening procedure in Newey and West (1994).
+% \end{minipage}
+% \end{table}
+
+% The forward-spread coefficients are positive across all maturities. Forward spreads contain information about future one-year excess bond returns.
+
+% \subsection{Q4(d)}
+
+% The Cochrane-Piazzesi factor is estimated by regressing the average one-year-ahead excess return across the two- to five-year bonds on the current one- through five-year forward rates. The fitted value from this regression defines the factor $cp_t$.
+
+% Figure \ref{fig:cp-factor} plots the time series of the Cochrane-Piazzesi factor, $cp_t$.
+
+% \begin{table}[H]
+% \centering
+% \caption{Cochrane-Piazzesi factor coefficients}
+
+% \label{tab:q4d}
+% \begin{tabular}{lr}
+% \toprule
+% Coefficient & Estimate \\
+% \midrule
+% $\hat{\theta}_0$ & -0.013448 \\
+% $\hat{\theta}_1$ & -0.987387 \\
+% $\hat{\theta}_2$ & -0.211534 \\
+% $\hat{\theta}_3$ & 0.809338 \\
+% $\hat{\theta}_4$ & 1.084352 \\
+% $\hat{\theta}_5$ & -0.464740 \\
+% \bottomrule
+% \end{tabular}
+% \begin{minipage}{0.72\textwidth}
+% \footnotesize\textit{Note:} OLS estimates. $R^2=0.158$; observations: 859.
+% \end{minipage}
+% \end{table}
+
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.95\linewidth]{q4d_cp_plot.pdf}
+%     \caption{CP factor Time Series}
+%     \label{fig:cp-factor}
+% \end{figure}
+
+
+
+% \subsection{Q4(e)}
+
+% Question 4(e) examines whether the Cochrane-Piazzesi factor predicts one-year excess returns for individual maturities. For $H=2,3,4,5$, the next one-year excess bond return is regressed on $cp_t$.
+
+% \begin{table}[H]
+% \centering
+% \caption{One-year excess-return predictability using the Cochrane-Piazzesi factor}
+% \label{tab:q4e}
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+% \midrule
+% $b^{(H)}$ [t-statistic] & 0.442 [3.57] & 0.827 [3.40] & 1.252 [3.63] & 1.479 [3.63] \\
+% $R^2$ & 0.137 & 0.144 & 0.170 & 0.155 \\
+% Observations & 859 & 859 & 859 & 859 \\
+% \bottomrule
+% \end{tabular}
+% \begin{minipage}{0.92\textwidth}
+% \footnotesize\textit{Note:} OLS estimates. Brackets contain Bartlett Newey-West (1987) t-statistics using the automatic bandwidth and VAR(1) prewhitening procedure in Newey and West (1994).
+% \end{minipage}
+% \end{table}
+
+% The estimated coefficients on $cp_t$ are positive for all maturities and generally increase with maturity. The $R^2$ values are between 0.137 and 0.170, which are generally larger than those from the single-forward-spread regressions in 4(c). 
+
+
+
+
+\newpage
+
+\section{Q4}
+
+\subsection{Q4(a)}
+
+Using the Fama-Bliss bond yield data, log yields, forward rates, and annual bond returns are constructed for maturities from one to five years. Yield spreads $xy^{(H)}$, forward spreads $xf^{(H)}$, and excess bond returns $xr^{(H)}$ are then calculated relative to the one-year bond. Table \ref{tab:q4a-averages} reports the sample averages for $H=2,3,4,5$.
+
+\begin{table}[H]
+\centering
+\caption{Average yield, forward-rate, and bond-return spreads}
+\label{tab:q4a-averages}
+\begin{tabular}{lrrrr}
+\toprule
+ & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+\midrule
+Mean $xy(H)$ & 0.001686 & 0.003278 & 0.004660 & 0.005639 \\
+Mean $xf(H)$ & 0.003372 & 0.006461 & 0.008805 & 0.009557 \\
+Mean $xr(H)$ & 0.003154 & 0.006069 & 0.008198 & 0.008719 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The average yield and forward spreads are positive and generally increase with maturity. Average excess bond returns are also positive for all maturities and are larger for longer-maturity bonds.
+
+\subsection{Q4(b)}
+
+Question 4(b) examines whether the current yield spread predicts future hold-to-maturity excess bond returns. For each maturity $H$, the average annual excess return from $t$ to $t+H$ is regressed on the current yield spread $xy_t^{(H)}$.
+
+\begin{table}[H]
+\centering
+\caption{Regressions of hold-to-maturity excess returns on yield spreads}
+\label{tab:q4b}
+\begin{tabular}{lrrrr}
+\toprule
+ & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+\midrule
+$b^{(H)}$ [t-statistic] & 0.677 [3.57] & 0.532 [3.21] & 0.414 [2.52] & 0.345 [2.30] \\
+$R^2$ & 0.077 & 0.052 & 0.038 & 0.032 \\
+Observations & 859 & 847 & 835 & 823 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize\textit{Note:} OLS estimates. Brackets contain Hansen-Hodrick (1980) t-statistics using uniform weights and $L=12H-1$ monthly lags.
+\end{minipage}
+\end{table}
+
+The estimated slope coefficients are positive for all maturities, indicating that larger yield spreads are associated with higher future hold-to-maturity excess bond returns. The estimated slope declines as maturity increases.
+
+
+\subsection{Q4(c)}
+
+Question 4(c) studies one-year-ahead return predictability using forward spreads. For each maturity, the next one-year excess bond return is regressed on the current forward spread $xf_t^{(H)}$. 
+
+\begin{table}[H]
+\centering
+\caption{Regressions of one-year excess returns on forward spreads}
+\label{tab:q4c}
+\begin{tabular}{lrrrr}
+\toprule
+ & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+\midrule
+$b^{(H)}$ [t-statistic] & 0.677 [3.21] & 0.889 [3.33] & 1.116 [3.59] & 0.964 [2.91] \\
+$R^2$ & 0.077 & 0.086 & 0.107 & 0.067 \\
+Observations & 859 & 859 & 859 & 859 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize\textit{Note:} OLS estimates. Brackets contain Bartlett Newey-West (1987) t-statistics using the automatic bandwidth procedure in Newey and West (1994).
+\end{minipage}
+\end{table}
+
+The forward-spread coefficients are positive across all maturities. Forward spreads contain information about future one-year excess bond returns.
+
+\subsection{Q4(d)}
+
+The Cochrane-Piazzesi factor is estimated by regressing the average one-year-ahead excess return across the two- to five-year bonds on the current one- through five-year forward rates. The fitted value from this regression defines the factor $cp_t$.
+
+Figure \ref{fig:cp-factor} plots the time series of the Cochrane-Piazzesi factor, $cp_t$.
+
+\begin{table}[H]
+\centering
+\caption{Cochrane-Piazzesi factor coefficients}
+
+\label{tab:q4d}
+\begin{tabular}{lr}
+\toprule
+Coefficient & Estimate \\
+\midrule
+$\hat{\theta}_0$ & -0.013448 \\
+$\hat{\theta}_1$ & -0.987387 \\
+$\hat{\theta}_2$ & -0.211534 \\
+$\hat{\theta}_3$ & 0.809338 \\
+$\hat{\theta}_4$ & 1.084352 \\
+$\hat{\theta}_5$ & -0.464740 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.72\textwidth}
+\footnotesize\textit{Note:} OLS estimates. $R^2=0.158$; observations: 859.
+\end{minipage}
+\end{table}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{q4d_cp_plot.pdf}
+    \caption{CP factor Time Series}
+    \label{fig:cp-factor}
+\end{figure}
+
+
+
+\subsection{Q4(e)}
+
+Question 4(e) examines whether the Cochrane-Piazzesi factor predicts one-year excess returns for individual maturities. For $H=2,3,4,5$, the next one-year excess bond return is regressed on $cp_t$.
+
+\begin{table}[H]
+\centering
+\caption{One-year excess-return predictability using the Cochrane-Piazzesi factor}
+\label{tab:q4e}
+\begin{tabular}{lrrrr}
+\toprule
+ & $H=2$ & $H=3$ & $H=4$ & $H=5$ \\
+\midrule
+$b^{(H)}$ [t-statistic] & 0.442 [4.13] & 0.827 [4.12] & 1.252 [4.39] & 1.479 [4.20] \\
+$R^2$ & 0.137 & 0.144 & 0.170 & 0.155 \\
+Observations & 859 & 859 & 859 & 859 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize\textit{Note:} OLS estimates. Brackets contain Bartlett Newey-West (1987) t-statistics using the automatic bandwidth procedure in Newey and West (1994).
+\end{minipage}
+\end{table}
+
+The estimated coefficients on $cp_t$ are positive for all maturities and generally increase with maturity. The $R^2$ values are between 0.137 and 0.170, which are generally larger than those from the single-forward-spread regressions in 4(c). 
+
+
+
+
+
+\end{document}
